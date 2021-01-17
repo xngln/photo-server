@@ -7,15 +7,28 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/xngln/photo-server/graph/generated"
 	"github.com/xngln/photo-server/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (r *mutationResolver) UploadImage(ctx context.Context, file graphql.Upload) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+func (r *mutationResolver) DeleteImage(ctx context.Context, id string) (*model.Image, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID string) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Image(ctx context.Context, id string) (*model.Image, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Images(ctx context.Context) ([]*model.Image, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
