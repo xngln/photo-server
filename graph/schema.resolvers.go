@@ -7,12 +7,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/xngln/photo-server/graph/generated"
 	"github.com/xngln/photo-server/graph/model"
 )
 
-func (r *mutationResolver) UploadImage(ctx context.Context, file graphql.Upload) (bool, error) {
+func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

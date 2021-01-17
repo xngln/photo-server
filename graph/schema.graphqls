@@ -16,12 +16,11 @@ type Query {
 input NewImage {
   name: String!
   price: Float!
-  thumbnail_url:String!
-  fullsize_url: String!
+  file: Upload!
 }
 
 type Mutation {
-  uploadImage(file: Upload!): Boolean!
+  uploadImage(input: NewImage!): Boolean!
   deleteImage(_id: String!): Image!
   createCheckoutSession(photoID: String!): String!
 }

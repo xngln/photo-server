@@ -54,7 +54,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateCheckoutSession func(childComplexity int, photoID string) int
 		DeleteImage           func(childComplexity int, id string) int
-		UploadImage           func(childComplexity int, file graphql.Upload) int
+		UploadImage           func(childComplexity int, input model.NewImage) int
 	}
 
 	Query struct {
@@ -64,7 +64,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	UploadImage(ctx context.Context, file graphql.Upload) (bool, error)
+	UploadImage(ctx context.Context, input model.NewImage) (bool, error)
 	DeleteImage(ctx context.Context, id string) (*model.Image, error)
 	CreateCheckoutSession(ctx context.Context, photoID string) (string, error)
 }
@@ -157,7 +157,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UploadImage(childComplexity, args["file"].(graphql.Upload)), true
+		return e.complexity.Mutation.UploadImage(childComplexity, args["input"].(model.NewImage)), true
 
 	case "Query.image":
 		if e.complexity.Query.Image == nil {
@@ -260,12 +260,11 @@ type Query {
 input NewImage {
   name: String!
   price: Float!
-  thumbnail_url:String!
-  fullsize_url: String!
+  file: Upload!
 }
 
 type Mutation {
-  uploadImage(file: Upload!): Boolean!
+  uploadImage(input: NewImage!): Boolean!
   deleteImage(_id: String!): Image!
   createCheckoutSession(photoID: String!): String!
 }
@@ -310,15 +309,15 @@ func (ec *executionContext) field_Mutation_deleteImage_args(ctx context.Context,
 func (ec *executionContext) field_Mutation_uploadImage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 graphql.Upload
-	if tmp, ok := rawArgs["file"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
-		arg0, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	var arg0 model.NewImage
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewImage2githubᚗcomᚋxnglnᚋphotoᚑserverᚋgraphᚋmodelᚐNewImage(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["file"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -590,7 +589,7 @@ func (ec *executionContext) _Mutation_uploadImage(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UploadImage(rctx, args["file"].(graphql.Upload))
+		return ec.resolvers.Mutation().UploadImage(rctx, args["input"].(model.NewImage))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1948,19 +1947,11 @@ func (ec *executionContext) unmarshalInputNewImage(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "thumbnail_url":
+		case "file":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnail_url"))
-			it.ThumbnailURL, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "fullsize_url":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullsize_url"))
-			it.FullsizeURL, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2448,6 +2439,11 @@ func (ec *executionContext) marshalNImage2ᚖgithubᚗcomᚋxnglnᚋphotoᚑserv
 		return graphql.Null
 	}
 	return ec._Image(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNNewImage2githubᚗcomᚋxnglnᚋphotoᚑserverᚋgraphᚋmodelᚐNewImage(ctx context.Context, v interface{}) (model.NewImage, error) {
+	res, err := ec.unmarshalInputNewImage(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
