@@ -24,7 +24,14 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 }
 
 func (r *queryResolver) Image(ctx context.Context, id string) (*model.Image, error) {
-	panic(fmt.Errorf("not implemented"))
+	dummyImage := model.Image{
+		ID:           "abc123z",
+		Name:         "tokyo",
+		Price:        1.00,
+		ThumbnailURL: "google.com",
+		FullsizeURL:  "amazon.com",
+	}
+	return &dummyImage, nil
 }
 
 func (r *queryResolver) Images(ctx context.Context) ([]*model.Image, error) {
