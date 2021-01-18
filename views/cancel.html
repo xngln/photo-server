@@ -1,0 +1,41 @@
+<html>
+<head>
+  <title>Checkout canceled</title>
+<style>
+  .message {
+    width: 160px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Baskerville;
+  }
+  a {
+    color: rgb(24, 24, 24);	
+    text-decoration: none;
+    position: absolute;
+    left: 37px;
+  }
+
+  a:hover {
+		font-style: oblique;
+		letter-spacing: 1px;
+    left: 39px;
+		transition: 350ms ease-in-out;
+	}
+
+  .fancy {
+    position: absolute;
+    right: 18px;
+  }
+</style>
+</head>
+<body>
+  <div class="message">
+    <div class="cancelled">Your order has been cancelled.</div>
+    <div style="display: inline;"> Click </div> 
+    <div style="display: inline;"><a href="https://photo.davidxliu.com/shop">here</a></div>
+    <div class="fancy" style="display: inline;"> to return to </div> <div> the shop.</div>
+  </div>
+</body>
+</html>

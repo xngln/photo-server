@@ -5,8 +5,10 @@ package graph
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"log"
+	"math"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -16,6 +18,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/google/uuid"
+	"github.com/stripe/stripe-go/v71"
+	stripeSession "github.com/stripe/stripe-go/v71/checkout/session"
 	"github.com/xngln/photo-server/graph/generated"
 	"github.com/xngln/photo-server/graph/model"
 )
@@ -184,7 +188,58 @@ func (r *mutationResolver) DeleteImage(ctx context.Context, id string) (*model.I
 }
 
 func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID string) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	domain := "http://localhost:8080"
+
+	// get image name from db
+	result, err := dbclient.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String("Images"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"_id": {S: aws.String(photoID)},
+		},
+	})
+	if err != nil || result.Item == nil {
+		fmt.Println("error getting item")
+		return "", err
+	}
+	image := model.ImageDB{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &image)
+
+	// get fullsize download url
+	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(fullsizeBucket),
+		Key:    aws.String(image.Name),
+	})
+	fullsizeURL, err := req.Presign(5 * time.Minute)
+	if err != nil {
+		log.Println("Failed to sign request", err)
+	}
+
+	// create checkout session
+	params := &stripe.CheckoutSessionParams{
+		PaymentMethodTypes: stripe.StringSlice([]string{
+			"card",
+		}),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			&stripe.CheckoutSessionLineItemParams{
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String(string(stripe.CurrencyCAD)),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String(image.Name),
+					},
+					UnitAmountDecimal: stripe.Float64(math.Round(image.Price * 100)),
+				},
+				Quantity: stripe.Int64(1),
+			},
+		},
+		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(fullsizeURL))),
+		CancelURL:  stripe.String(domain + "/cancel"),
+	}
+	sess, err := stripeSession.New(params)
+	if err != nil {
+		log.Printf("stripeSession.New: %v", err)
+	}
+	return sess.ID, nil
 }
 
 func (r *queryResolver) Image(ctx context.Context, id string) (*model.Image, error) {

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/hex"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -11,11 +13,16 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
+	"github.com/stripe/stripe-go/v71"
 	"github.com/xngln/photo-server/graph"
 	"github.com/xngln/photo-server/graph/generated"
 )
 
 const defaultPort = "8080"
+
+type SuccessPageData struct {
+	FullsizeURL string
+}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -25,6 +32,8 @@ func main() {
 	var mb int64 = 1 << 20
 
 	router := chi.NewRouter()
+
+	stripe.Key = "sk_test_51IArflBaVACZJJ1Z19s2f07oQIgMYBCIp1YzMoOMvzr39HTRn9Ym6xp2wqgz7lbn7jNezhx3wTGoePCH9K70wn8N00TZhNaDmF"
 
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
@@ -44,6 +53,18 @@ func main() {
 
 	router.Handle("/", playground.Handler("Photo Store", "/query"))
 	router.Handle("/query", srv)
+	router.HandleFunc("/success", func(w http.ResponseWriter, r *http.Request) {
+		fullsizeURL, _ := hex.DecodeString(r.URL.Query().Get("downloadurl"))
+		tmpl := template.Must(template.ParseFiles("views/success.html"))
+		data := SuccessPageData{
+			FullsizeURL: string(fullsizeURL),
+		}
+		tmpl.Execute(w, data)
+	})
+	router.HandleFunc("/cancel", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("views/cancel.html"))
+		tmpl.Execute(w, nil)
+	})
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
