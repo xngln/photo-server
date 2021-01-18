@@ -64,7 +64,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	UploadImage(ctx context.Context, input model.NewImage) (bool, error)
+	UploadImage(ctx context.Context, input model.NewImage) (*model.Image, error)
 	DeleteImage(ctx context.Context, id string) (*model.Image, error)
 	CreateCheckoutSession(ctx context.Context, photoID string) (string, error)
 }
@@ -264,7 +264,7 @@ input NewImage {
 }
 
 type Mutation {
-  uploadImage(input: NewImage!): Boolean!
+  uploadImage(input: NewImage!): Image!
   deleteImage(_id: String!): Image!
   createCheckoutSession(photoID: String!): String!
 }
@@ -601,9 +601,9 @@ func (ec *executionContext) _Mutation_uploadImage(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.Image)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNImage2ᚖgithubᚗcomᚋxnglnᚋphotoᚑserverᚋgraphᚋmodelᚐImage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteImage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {

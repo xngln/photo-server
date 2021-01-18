@@ -20,7 +20,7 @@ input NewImage {
 }
 
 type Mutation {
-  uploadImage(input: NewImage!): Boolean!
+  uploadImage(input: NewImage!): Image!
   deleteImage(_id: String!): Image!
   createCheckoutSession(photoID: String!): String!
 }

@@ -20,17 +20,7 @@ import (
 	"github.com/xngln/photo-server/graph/model"
 )
 
-var sess, err = session.NewSession(&aws.Config{
-	Region: aws.String("us-east-2"),
-})
-
-const thumbnailBucket = "david-photo-store-images-thumbnails"
-const fullsizeBucket = "david-photo-store-images-full"
-
-var s3client = s3.New(sess)
-var dbclient = dynamodb.New(sess)
-
-func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage) (bool, error) {
+func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage) (*model.Image, error) {
 	uploader := s3manager.NewUploader(sess)
 
 	// upload to thumbnail bucket
@@ -42,7 +32,7 @@ func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage
 	})
 	if err != nil {
 		// add error handling
-		return false, err
+		return nil, err
 	}
 
 	// upload to fullsize bucket
@@ -53,7 +43,7 @@ func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage
 	})
 	if err != nil {
 		// add error handling
-		return false, err
+		return nil, err
 	}
 
 	// add to dynamodb
@@ -65,7 +55,7 @@ func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
 		fmt.Println("error marshalling new image item")
-		return false, err
+		return nil, err
 	}
 	dbinput := &dynamodb.PutItemInput{
 		Item:      av,
@@ -74,10 +64,37 @@ func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage
 	_, err = dbclient.PutItem(dbinput)
 	if err != nil {
 		fmt.Println("Got error calling PutItem")
-		return false, err
+		return nil, err
 	}
 
-	return true, nil
+	// get image urls
+	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(thumbnailBucket),
+		Key:    aws.String(input.Name),
+	})
+	thumbnailURL, err := req.Presign(5 * time.Minute)
+	if err != nil {
+		log.Println("Failed to sign request", err)
+	}
+
+	req, _ = s3client.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(fullsizeBucket),
+		Key:    aws.String(input.Name),
+	})
+	fullsizeURL, err := req.Presign(5 * time.Minute)
+	if err != nil {
+		log.Println("Failed to sign request", err)
+	}
+
+	ret := model.Image{
+		ID:           item.ID,
+		Name:         input.Name,
+		Price:        input.Price,
+		ThumbnailURL: thumbnailURL,
+		FullsizeURL:  fullsizeURL,
+	}
+
+	return &ret, nil
 }
 
 func (r *mutationResolver) DeleteImage(ctx context.Context, id string) (*model.Image, error) {
@@ -175,11 +192,12 @@ func (r *queryResolver) Image(ctx context.Context, id string) (*model.Image, err
 	image := model.ImageDB{}
 	err = dynamodbattribute.UnmarshalMap(result.Item, &image)
 
+	// get image urls
 	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(thumbnailBucket),
 		Key:    aws.String(image.Name),
 	})
-	thumbnailURL, err := req.Presign(15 * time.Minute)
+	thumbnailURL, err := req.Presign(5 * time.Minute)
 	if err != nil {
 		log.Println("Failed to sign request", err)
 	}
@@ -215,3 +233,19 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var sess, err = session.NewSession(&aws.Config{
+	Region: aws.String("us-east-2"),
+})
+
+const thumbnailBucket = "david-photo-store-images-thumbnails"
+const fullsizeBucket = "david-photo-store-images-full"
+
+var s3client = s3.New(sess)
+var dbclient = dynamodb.New(sess)
