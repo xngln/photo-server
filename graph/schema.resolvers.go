@@ -191,7 +191,7 @@ func (r *mutationResolver) DeleteImage(ctx context.Context, id string) (*model.I
 func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID string) (string, error) {
 	var domain string
 	if os.Getenv("HEROKU_ENV") == "PROD" {
-		domain = "http://localhost:8080"
+		domain = "https://protected-bastion-36826.herokuapp.com/"
 	} else {
 		domain = "http://localhost:8080"
 	}
