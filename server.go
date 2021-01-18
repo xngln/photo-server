@@ -33,12 +33,17 @@ func main() {
 
 	router := chi.NewRouter()
 
-	stripe.Key = "sk_test_51IArflBaVACZJJ1Z19s2f07oQIgMYBCIp1YzMoOMvzr39HTRn9Ym6xp2wqgz7lbn7jNezhx3wTGoePCH9K70wn8N00TZhNaDmF"
+	stripe.Key = os.Getenv("STRIPE_SECRET")
 
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8080", "http://localhost:3000"},
+		AllowedOrigins: []string{
+			"http://localhost:8080",
+			"http://localhost:3000",
+			"http://photo.davidxliu.com",
+			"https://photo.davidxliu.com",
+		},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
