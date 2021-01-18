@@ -29,7 +29,7 @@ The server, hosted on Heroku, exposes one GraphQL endpoint at `https://protected
 You can also visit `https://protected-bastion-36826.herokuapp.com/` to use the GraphQL playground. Since the project is on the free tier of Heroku, the first request may take up to 30 seconds to complete.
 
 ## Shop
-To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select shop.
+To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select *shop*.
 This will display all the images which are currently available to purchase for download. 
 Clicking the prompt to buy an image will ask the server to start a new Stripe checkout session and redirect you to the checkout page. 
 Sadly, there is a "cart" feature hasn't been implemented yet, so one can only buy a single image at a time. The shop is still in test mode, so you can try 
