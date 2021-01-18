@@ -25,6 +25,9 @@ The schemas for the endpoints, queries, and mutations can be found in `graph/sch
 
 The resolvers for all queries and mutations are implemented in `graph/schema.resolvers.go`.
 
+The server, hosted on Heroku, exposes one GraphQL endpoint at `https://protected-bastion-36826.herokuapp.com/query`. 
+You can also visit `https://protected-bastion-36826.herokuapp.com/` to use the GraphQL playground. Since the project is on the free tier of Heroku, the first request may take up to 30 seconds to complete.
+
 ## Shop
 To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). This is the homepage of the portfolio. In the header, select shop.
 This will display all the images which are currently available to purchase for download. 
