@@ -1,0 +1,4 @@
+curl localhost:8080/query \
+  -F operations='{ "query": "mutation ($id: String!) { deleteImage(id: $id) }", "variables": { "input": {"name": "test.jpg", "price": 1, "file": null } } }' \
+  -F map='{ "0": ["variables.input.file"] }' \
+  -F 0=@./testimages/test1.jpg
