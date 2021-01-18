@@ -32,7 +32,7 @@ You can also visit `https://protected-bastion-36826.herokuapp.com/` to use the G
 To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select *shop*.
 This will display all the images which are currently available to purchase for download. 
 Clicking the prompt to buy an image will ask the server to start a new Stripe checkout session and redirect you to the checkout page. 
-Sadly, there is a "cart" feature hasn't been implemented yet, so one can only buy a single image at a time. The shop is still in test mode, so you can try 
+Sadly, a "cart" feature hasn't been implemented yet, so one can only buy a single image at a time. The shop is still in test mode, so you can try 
 the following credit card to get a successful purchase:
 
 > Card #: 4242 4242 4242 4242. Name, address, cvv can be anything. Expiry date must be any future date. 
