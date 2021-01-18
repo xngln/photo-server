@@ -1,4 +1,4 @@
 curl localhost:8080/query \
-  -F operations='{ "query": "mutation ($input: NewImage!) { uploadImage(input: $input) }", "variables": { "input": {"name": "test.jpg", "price": 1, "file": null } } }' \
+  -F operations='{ "query": "mutation ($input: NewImage!) { uploadImage(input: $input) { _id, name, price }}", "variables": { "input": {"name": "test.jpg", "price": 1, "file": null } } }' \
   -F map='{ "0": ["variables.input.file"] }' \
   -F 0=@./testimages/test1.jpg

@@ -20,6 +20,16 @@ import (
 	"github.com/xngln/photo-server/graph/model"
 )
 
+var sess, err = session.NewSession(&aws.Config{
+	Region: aws.String("us-east-2"),
+})
+
+const thumbnailBucket = "david-photo-store-images-thumbnails"
+const fullsizeBucket = "david-photo-store-images-full"
+
+var s3client = s3.New(sess)
+var dbclient = dynamodb.New(sess)
+
 func (r *mutationResolver) UploadImage(ctx context.Context, input model.NewImage) (*model.Image, error) {
 	uploader := s3manager.NewUploader(sess)
 
@@ -222,7 +232,52 @@ func (r *queryResolver) Image(ctx context.Context, id string) (*model.Image, err
 }
 
 func (r *queryResolver) Images(ctx context.Context) ([]*model.Image, error) {
-	panic(fmt.Errorf("not implemented"))
+	params := &dynamodb.ScanInput{
+		TableName: aws.String("Images"),
+	}
+	result, err := dbclient.Scan(params)
+	if err != nil {
+		fmt.Println("error while scanning table")
+		return nil, err
+	}
+	obj := []*model.ImageDB{}
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &obj)
+	if err != nil {
+		fmt.Println("error while unmarshaling list of maps")
+	}
+	ret := []*model.Image{}
+	for _, v := range obj {
+		image := model.Image{
+			ID:    v.ID,
+			Name:  v.Name,
+			Price: v.Price,
+		}
+
+		// get image urls
+		req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
+			Bucket: aws.String(thumbnailBucket),
+			Key:    aws.String(image.Name),
+		})
+		thumbnailURL, err := req.Presign(5 * time.Minute)
+		if err != nil {
+			log.Println("Failed to sign request", err)
+		}
+
+		req, _ = s3client.GetObjectRequest(&s3.GetObjectInput{
+			Bucket: aws.String(fullsizeBucket),
+			Key:    aws.String(image.Name),
+		})
+		fullsizeURL, err := req.Presign(5 * time.Minute)
+		if err != nil {
+			log.Println("Failed to sign request", err)
+		}
+		image.ThumbnailURL = thumbnailURL
+		image.FullsizeURL = fullsizeURL
+
+		ret = append(ret, &image)
+	}
+
+	return ret, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -233,19 +288,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-var sess, err = session.NewSession(&aws.Config{
-	Region: aws.String("us-east-2"),
-})
-
-const thumbnailBucket = "david-photo-store-images-thumbnails"
-const fullsizeBucket = "david-photo-store-images-full"
-
-var s3client = s3.New(sess)
-var dbclient = dynamodb.New(sess)
