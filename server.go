@@ -43,6 +43,7 @@ func main() {
 			"http://localhost:3000",
 			"http://photo.davidxliu.com",
 			"https://photo.davidxliu.com",
+			"https://www.photo.davidxliu.com",
 		},
 		AllowCredentials: true,
 		Debug:            true,
