@@ -37,6 +37,16 @@ curl https://protected-bastion-36826.herokuapp.com/query \
   -F 0=@./testimages/test.jpg
 ```
 
+Deleting image by ID (using the GraphQL playground):
+```
+mutation deleteImage($id: String!) {
+  deleteAuthor(id: $id) {
+     _id
+     name
+  }
+}
+```
+
 ## Shop
 To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select *shop*.
 This will display all the images which are currently available to purchase for download. 
