@@ -28,6 +28,15 @@ The resolvers for all queries and mutations are implemented in `graph/schema.res
 The server, hosted on Heroku, exposes one GraphQL endpoint at `https://protected-bastion-36826.herokuapp.com/query`. 
 You can also visit `https://protected-bastion-36826.herokuapp.com/` to use the GraphQL playground. Since the project is on the free tier of Heroku, the first request may take up to 30 seconds to complete.
 
+## Example Requests 
+Adding new image to shop:
+```
+curl https://protected-bastion-36826.herokuapp.com/query \
+  -F operations='{ "query": "mutation ($input: NewImage!) { uploadImage(input: $input) { _id, name, price }}", "variables": { "input": {"name": "test.jpg", "price": 1, "file": null } } }' \
+  -F map='{ "0": ["variables.input.file"] }' \
+  -F 0=@./testimages/test.jpg
+```
+
 ## Shop
 To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select *shop*.
 This will display all the images which are currently available to purchase for download. 
