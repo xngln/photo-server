@@ -30,7 +30,7 @@ You can also visit `https://protected-bastion-36826.herokuapp.com/` to use the G
 
 ## Example Requests 
 Adding new image to shop:
-```
+```bash
 curl https://protected-bastion-36826.herokuapp.com/query \
   -F operations='{ "query": "mutation ($input: NewImage!) { uploadImage(input: $input) { _id, name, price }}", "variables": { "input": {"name": "test.jpg", "price": 1, "file": null } } }' \
   -F map='{ "0": ["variables.input.file"] }' \
@@ -38,7 +38,7 @@ curl https://protected-bastion-36826.herokuapp.com/query \
 ```
 
 Deleting image by ID (using the GraphQL playground):
-```
+```graphql
 mutation deleteImage($id: String!) {
   deleteAuthor(id: $id) {
      _id
@@ -48,16 +48,16 @@ mutation deleteImage($id: String!) {
 ```
 
 Creating a new Stripe checkout session using product(image) ID:
-```
+```graphql
 mutation createCheckoutSession {
     createCheckoutSession(photoID: "7018c40f-ad75-4d23-b1a8-33eb051f8e1f")
 }
 ```
 
 Query for single image by ID:
-```
+```graphql
 query {
-	image(_id: "7018c40f-ad75-4d23-b1a8-33eb051f8e1f"){
+  image(_id: "7018c40f-ad75-4d23-b1a8-33eb051f8e1f") {
     _id
     price	
     name
