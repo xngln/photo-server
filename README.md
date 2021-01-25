@@ -47,6 +47,13 @@ mutation deleteImage($id: String!) {
 }
 ```
 
+Creating a new Stripe checkout session using product(image) ID:
+```
+mutation createCheckoutSession {
+    createCheckoutSession(photoID: "7018c40f-ad75-4d23-b1a8-33eb051f8e1f")
+}
+```
+
 ## Shop
 To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select *shop*.
 This will display all the images which are currently available to purchase for download. 
