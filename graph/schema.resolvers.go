@@ -197,7 +197,7 @@ func (r *mutationResolver) DeleteImage(ctx context.Context, id string) (*model.I
 func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID string) (string, error) {
 	var domain string
 	if os.Getenv("HEROKU_ENV") == "PROD" {
-		domain = "https://protected-bastion-36826.herokuapp.com/"
+		domain = "https://protected-bastion-36826.herokuapp.com"
 	} else {
 		domain = "http://localhost:8080"
 	}
@@ -230,14 +230,14 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 
 	// get LR Preset download url
 	presetFileName := image.Name
-	// req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
-	// 	Bucket: aws.String(presetsBucket),
-	// 	Key:    aws.String(presetFileName),
-	// })
-	// presetURL, err := req.Presign(5 * time.Minute)
-	// if err != nil {
-	// 	log.Println("Failed to sign request", err)
-	// }
+	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(presetsBucket),
+		Key:    aws.String(presetFileName),
+	})
+	presetURL, err := req.Presign(5 * time.Minute)
+	if err != nil {
+		log.Println("Failed to sign request", err)
+	}
 
 	// create checkout session
 	params := &stripe.CheckoutSessionParams{
@@ -258,7 +258,7 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 		},
 		Mode: stripe.String(string(stripe.CheckoutSessionModePayment)),
 		// SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(fullsizeURL))),
-		SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(presetFileName))),
+		SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(presetURL))),
 		CancelURL:  stripe.String(domain + "/cancel"),
 	}
 	sess, err := stripeSession.New(params)
