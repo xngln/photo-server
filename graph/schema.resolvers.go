@@ -29,8 +29,14 @@ var sess, err = session.NewSession(&aws.Config{
 	Region: aws.String("us-east-2"),
 })
 
+/***
+TODO:
+update thumbnail and fullsize img upload/delete
+***/
+
 const thumbnailBucket = "david-photo-store-images-thumbnails"
 const fullsizeBucket = "david-photo-store-images-full"
+const presetsBucket = "david-photo-store-lr-presets"
 
 var s3client = s3.New(sess)
 var dbclient = dynamodb.New(sess)
@@ -211,11 +217,25 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 	err = dynamodbattribute.UnmarshalMap(result.Item, &image)
 
 	// get fullsize download url
-	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
+	/***
+	req_old, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(fullsizeBucket),
 		Key:    aws.String(image.Name),
 	})
-	fullsizeURL, err := req.Presign(5 * time.Minute)
+	fullsizeURL, err := req_old.Presign(5 * time.Minute)
+	if err != nil {
+		log.Println("Failed to sign request", err)
+	}
+	***/
+
+	// get LR Preset download url
+	presetName := image.Name //   make this cleaner
+	presetFileName := presetName + ".xmp"
+	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(presetsBucket),
+		Key:    aws.String(presetFileName),
+	})
+	presetURL, err := req.Presign(5 * time.Minute)
 	if err != nil {
 		log.Println("Failed to sign request", err)
 	}
@@ -237,8 +257,9 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 				Quantity: stripe.Int64(1),
 			},
 		},
-		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(fullsizeURL))),
+		Mode: stripe.String(string(stripe.CheckoutSessionModePayment)),
+		// SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(fullsizeURL))),
+		SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(presetURL))),
 		CancelURL:  stripe.String(domain + "/cancel"),
 	}
 	sess, err := stripeSession.New(params)
@@ -315,9 +336,10 @@ func (r *queryResolver) Images(ctx context.Context) ([]*model.Image, error) {
 		}
 
 		// get image urls
+		thumbnailName := image.Name[:2] + "-after.jpg"
 		req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
 			Bucket: aws.String(thumbnailBucket),
-			Key:    aws.String(image.Name),
+			Key:    aws.String(thumbnailName),
 		})
 		thumbnailURL, err := req.Presign(5 * time.Minute)
 		if err != nil {
