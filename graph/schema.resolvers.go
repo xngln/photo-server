@@ -229,8 +229,7 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 	***/
 
 	// get LR Preset download url
-	presetName := image.Name //   make this cleaner
-	presetFileName := presetName + ".xmp"
+	presetFileName := image.Name
 	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(presetsBucket),
 		Key:    aws.String(presetFileName),
