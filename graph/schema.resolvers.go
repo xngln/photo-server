@@ -230,10 +230,10 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 
 	// get LR Preset download url
 	presetFileName := image.Name
-	req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
-		Bucket: aws.String(presetsBucket),
-		Key:    aws.String(presetFileName),
-	})
+	// req, _ := s3client.GetObjectRequest(&s3.GetObjectInput{
+	// 	Bucket: aws.String(presetsBucket),
+	// 	Key:    aws.String(presetFileName),
+	// })
 	// presetURL, err := req.Presign(5 * time.Minute)
 	// if err != nil {
 	// 	log.Println("Failed to sign request", err)
