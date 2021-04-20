@@ -234,10 +234,10 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 		Bucket: aws.String(presetsBucket),
 		Key:    aws.String(presetFileName),
 	})
-	presetURL, err := req.Presign(5 * time.Minute)
-	if err != nil {
-		log.Println("Failed to sign request", err)
-	}
+	// presetURL, err := req.Presign(5 * time.Minute)
+	// if err != nil {
+	// 	log.Println("Failed to sign request", err)
+	// }
 
 	// create checkout session
 	params := &stripe.CheckoutSessionParams{
@@ -258,7 +258,7 @@ func (r *mutationResolver) CreateCheckoutSession(ctx context.Context, photoID st
 		},
 		Mode: stripe.String(string(stripe.CheckoutSessionModePayment)),
 		// SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(fullsizeURL))),
-		SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(presetURL))),
+		SuccessURL: stripe.String(domain + "/success?downloadurl=" + hex.EncodeToString([]byte(presetFileName))),
 		CancelURL:  stripe.String(domain + "/cancel"),
 	}
 	sess, err := stripeSession.New(params)
