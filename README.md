@@ -67,7 +67,7 @@ query {
 
 ## Shop
 To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select *shop*.
-This will display all the Lightroom Presets (.xmp files) which are currently available to purchase for download. 
+This will display all the Lightroom Presets (.xmp files) with a sample photo edited using that Preset which are currently available to purchase for download. 
 Clicking the prompt to buy a Preset will ask the server to start a new Stripe checkout session and redirect you to the checkout page. 
 Sadly, a "cart" feature hasn't been implemented yet, so one can only buy a single Preset at a time. The shop is still in test mode, so you can try 
 the following credit card to get a successful purchase:
