@@ -69,10 +69,11 @@ query {
 To checkout out the shop, go to [photo.davidxliu.com](https://www.photo.davidxliu.com). The code can be viewed [here](https://github.com/xngln/photo-store-client). This is the homepage of the portfolio. In the header, select *shop*.
 This will display all the Lightroom Presets (.xmp files) with a sample photo edited using that Preset which are currently available to purchase for download. 
 Clicking the prompt to buy a Preset will ask the server to start a new Stripe checkout session and redirect you to the checkout page. 
-Sadly, a "cart" feature hasn't been implemented yet, so one can only buy a single Preset at a time. The shop is still in test mode, so you can try 
+Sadly, a "cart" feature hasn't been implemented yet, so only one Preset can be purchased at a time. The shop is still in test mode, so you can try 
 the following credit card to get a successful purchase:
 
-> Card #: 4242 4242 4242 4242. Name, address, cvv can be anything. Expiry date must be any future date. 
+> Card #: 4242 4242 4242 4242. 
+The name, address, and cvv can be anything and the epiry date must be any future date. 
 
 After the payment is processed, you will be redirected to the success page, from which you can download your Lightroom Preset :) 
 This download url is a pre-signed URL to access the object from its S3 bucket, so it is only available for a few minutes after the payment is completed. 
