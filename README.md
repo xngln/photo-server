@@ -73,7 +73,8 @@ Sadly, a "cart" feature hasn't been implemented yet, so only one Preset can be p
 the following credit card to get a successful purchase:
 
 > Card #: 4242 4242 4242 4242. 
-The name, address, and cvv can be anything and the epiry date must be any future date. 
+
+The name, address, and cvv can be anything and the expiry date must be any future date. 
 
 After the payment is processed, you will be redirected to the success page, from which you can download your Lightroom Preset :) 
 This download url is a pre-signed URL to access the object from its S3 bucket, so it is only available for a few minutes after the payment is completed. 
